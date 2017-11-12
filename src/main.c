@@ -66,7 +66,7 @@ void SystemClock_Config(void);
 /* USER CODE END PFP */
 
 /* USER CODE BEGIN 0 */
-
+uint8_t rxBuffer[16];
 /* USER CODE END 0 */
 
 int main(void)
@@ -98,6 +98,8 @@ int main(void)
   MX_USART2_UART_Init();
 
   /* USER CODE BEGIN 2 */
+  HAL_UART_Receive_IT(&huart2,rxBuffer,6);
+
   WS2812_Init();
   WS2812_StartStream();
   /* USER CODE END 2 */
@@ -124,6 +126,22 @@ int main(void)
   /* USER CODE END 3 */
 
 }
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+    if (huart == &huart2)
+    {
+      if (rxBuffer[0] == '=')
+      {
+        uint32_t color;
+        color = *(uint32_t*)&rxBuffer[3];
+        MATRIX_SetPixel(rxBuffer[1],rxBuffer[2],color);
+        MATRIX_Update();
+      }
+      HAL_UART_Receive_IT(&huart2,rxBuffer,6);
+    }
+}
+
 
 /** System Clock Configuration
 */
