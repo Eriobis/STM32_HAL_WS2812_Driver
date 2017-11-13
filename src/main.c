@@ -136,6 +136,9 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
         uint32_t color;
         color = *(uint32_t*)&rxBuffer[3];
         MATRIX_SetPixel(rxBuffer[1],rxBuffer[2],color);
+      }
+      if (rxBuffer[0] == '+')
+      {
         MATRIX_Update();
       }
       HAL_UART_Receive_IT(&huart2,rxBuffer,6);
